@@ -1,0 +1,167 @@
+<?php
+
+/**
+ * Assign separate themes for different roles
+ * To assign theme for path "/admin/" you have to set theme from administrative interface as Admin Theme
+ *
+ * @author Serj Tiutiun (tiutiun AT gmail.com)
+ * @date 1 Jul 2007
+ * $Id $
+ */
+
+function role_theme_switcher_init()
+{
+   global $user, $custom_theme, $theme;
+
+    $roles = array_keys($user->roles);
+
+    $themes = system_themes();
+    $theme_names = $themes['status']['#default_value'];
+
+
+    $sql =  'SELECT p.*, i.filename FROM {role_theme_switcher} p '.
+            'INNER JOIN {system} i '.
+                ' ON i.name = p.theme '.
+            "WHERE i.type = 'theme' AND i.status = 1";
+    $db_answer = db_query($sql);
+
+
+    // We use Role Theme Switcher only if theme is ON and it is not default
+    // If user has some roles, than if at least one role has a theme set, then we use this theme
+    $use_rts = false;
+    while ($db_row = db_fetch_object($db_answer))
+        if (in_array($db_row->role_id, $roles) && $db_row->theme != 'default')
+            $use_rts = array(
+                'theme'    => $db_row->theme,
+                'filename' => $db_row->filename);
+
+    // Switch theme
+    if ($use_rts !== false)
+    {
+        $theme = null; // We need to use this hack because of theme_init logic
+        $custom_theme = $use_rts['theme'];
+    }
+    // Finished switching theme
+}
+
+
+
+function role_theme_switcher_menu()
+{
+    $items = array();
+
+    $items[] = array(
+        'path'               => 'admin/settings/role_theme_switcher',
+        'title'              => t('Role theme switcher'),
+        'description'        => t('Here you can set different themes for different roles in your system'),
+        'callback'           => 'rts_set_theme_to_role',
+        'access'             => user_access('access administration pages'),
+        'type'               => MENU_NORMAL_ITEM
+    );
+
+    $items[] = array(
+        'path'               => 'admin/settings/role_theme_switcher/submit',
+        'callback'           => 'rts_submit',
+        'access'             => user_access('access administration pages'),
+        'type'               => MENU_CALLBACK
+    );
+
+    return $items;
+}
+
+
+function rts_set_theme_to_role()
+{
+    // Getting THEMES and ROLES names and ids
+    $roles = $themes = array();
+
+    //Roles
+    $sql = "SELECT * FROM {role} ORDER BY name ASC";
+    $db_answer = db_query($sql);
+
+    while ($db_row = db_fetch_object($db_answer))
+        $roles[$db_row->rid] = $db_row->name;
+
+    // Themes
+    $sql = "SELECT name FROM {system} WHERE type = 'theme' AND status = 1 ORDER BY name ASC";
+    $db_answer = db_query($sql);
+
+    while ($db_row = db_fetch_object($db_answer))
+        $themes[] =  $db_row->name;
+
+    // Themes for Roles
+    $sql = 'SELECT * FROM {role_theme_switcher}';
+    $db_answer = db_query($sql);
+
+    while ($db_row = db_fetch_object($db_answer))
+        $theme_for_role[$roles[$db_row->role_id]] = $db_row->theme;
+    // Finished getting
+
+    $output =   '<form method="POST" action="'.url('admin/settings/role_theme_switcher/submit').'" style="display: inline;" name="select_theme_for_role">'.
+                '<table border="0">'."\r".
+                '<tr>';
+
+    foreach ($roles AS $role_id => $role_name)
+        $output .= '<td><strong>'.$role_name.'</strong></td>';
+
+    $output .= '</tr>'."\r".'<tr>';
+
+    foreach ($roles AS $role_id => $role_name)
+    {
+        $output .= '<td>'."\r";
+        $output .=  '<select name="role_'.$role_name.'">'."\r".
+                    '<option value="default">Default</default>';
+
+            foreach ($themes AS $theme_name)
+                $output .= '<option value="'.
+                            htmlspecialchars($theme_name, ENT_QUOTES).
+                            '" '.
+                            ($theme_for_role[$role_name] == $theme_name ? 'selected' : '').
+                            '>'.
+                            htmlspecialchars(ucfirst($theme_name), ENT_QUOTES).
+                            '</option>';
+
+        $output .= "\r".'</select>'."\r".'</td>';
+    }
+
+
+    $output .=  '</tr></table>'."\r".
+                '<center><input type="submit" name="rts_submit" value="Set themes" style="width: 100px;"></center>'.
+                '</form>'."\r\r\r";
+
+    return $output;
+}
+
+
+
+
+function rts_submit()
+{
+    // Store submitted Themes for Roles
+    if (isset($_POST['rts_submit']))
+    {
+        $themes = array();
+        foreach ($_POST AS $key => $val)
+            if (strncmp('role_', $key, 5) == 0)
+                $themes[substr($key, 5)] = $val;
+
+        $sql = 'TRUNCATE {role_theme_switcher}';
+        $db_answer = db_query($sql);
+
+        $sql = "SELECT * FROM {role} ORDER BY name ASC";
+        $db_answer = db_query($sql);
+        $roles = array();
+
+        while ($db_row = db_fetch_object($db_answer))
+            $roles[str_replace(' ', '_', $db_row->name)] = $db_row->rid;
+
+
+        foreach ($themes AS $role_name => $theme_name)
+        {
+            $sql = "INSERT INTO {role_theme_switcher} (role_id, theme) VALUES(%d, '%s')";
+            db_query($sql, $roles[$role_name], $theme_name);
+        }
+    } // If POST was set
+
+    drupal_set_header('Location: '.url('admin/settings/role_theme_switcher'));
+}

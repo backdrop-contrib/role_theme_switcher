@@ -1,0 +1,6 @@
+; $Id $
+name = Role_Theme_Switcher
+description = "Assign separate themes to different roles"
+Author = "Serj Tiutiun. tiutiun AT gmail.com"
+version = "5.1"
+
