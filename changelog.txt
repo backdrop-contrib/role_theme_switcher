@@ -5,6 +5,9 @@
 Role Theme Switcher  1.1, 2007 Nov 01
 ------------------------
 - Added support for Drupal cache system
+  As caching system is a pretty tricky thing, after every change in Role Theme Switcher
+  to see your changes ASAP I would advice you to empty the whole cache.
+  Otherwise your users will see the changes only after your cache expire.
 
 
 Role Theme Switcher  1.0, 2007 Jul 01
