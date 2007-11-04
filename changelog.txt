@@ -1,0 +1,12 @@
+// @author Serj Tiutiun (tiutiun AT gmail.com)
+// @date 1 Nov 2007
+// $Id $
+
+Role Theme Switcher  1.1, 2007 Nov 01
+------------------------
+- Added support for Drupal cache system
+
+
+Role Theme Switcher  1.0, 2007 Jul 01
+------------------------
+- initial release

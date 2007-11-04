@@ -5,11 +5,11 @@
  * To assign theme for path "/admin/" you have to set theme from administrative interface as Admin Theme
  *
  * @author Serj Tiutiun (tiutiun AT gmail.com)
- * @date 1 Jul 2007
+ * @date 1 Nov 2007
  * $Id $
  */
 
-function role_theme_switcher_init()
+function role_theme_switcher_mainfunc()
 {
    global $user, $custom_theme, $theme;
 
@@ -46,25 +46,30 @@ function role_theme_switcher_init()
 
 
 
-function role_theme_switcher_menu()
+function role_theme_switcher_menu($may_cache)
 {
     $items = array();
 
-    $items[] = array(
-        'path'               => 'admin/settings/role_theme_switcher',
-        'title'              => t('Role theme switcher'),
-        'description'        => t('Here you can set different themes for different roles in your system'),
-        'callback'           => 'rts_set_theme_to_role',
-        'access'             => user_access('access administration pages'),
-        'type'               => MENU_NORMAL_ITEM
-    );
+    if ($may_cache)
+    {
+        $items[] = array(
+            'path'               => 'admin/settings/role_theme_switcher',
+            'title'              => t('Role theme switcher'),
+            'description'        => t('Here you can set different themes for different roles in your system'),
+            'callback'           => 'rts_set_theme_to_role',
+            'access'             => user_access('access administration pages'),
+            'type'               => MENU_NORMAL_ITEM
+        );
 
-    $items[] = array(
-        'path'               => 'admin/settings/role_theme_switcher/submit',
-        'callback'           => 'rts_submit',
-        'access'             => user_access('access administration pages'),
-        'type'               => MENU_CALLBACK
-    );
+        $items[] = array(
+            'path'               => 'admin/settings/role_theme_switcher/submit',
+            'callback'           => 'rts_submit',
+            'access'             => user_access('access administration pages'),
+            'type'               => MENU_CALLBACK
+        );
+    }
+
+    role_theme_switcher_mainfunc();
 
     return $items;
 }
