@@ -15,7 +15,7 @@ function role_theme_switcher_mainfunc()
 
     $roles = array_keys($user->roles);
 
-    $themes = system_themes();
+    $themes = list_themes();
     $theme_names = $themes['status']['#default_value'];
 
 

@@ -2,6 +2,12 @@
 // @date 1 Nov 2007
 // $Id $
 
+
+
+Role Theme Switcher  1.2, 2007 Dec 04
+------------------------
+- Fixed bug if in Drupal system used another phptemplate compatible theme.
+
 Role Theme Switcher  1.1, 2007 Nov 01
 ------------------------
 - Added support for Drupal cache system
