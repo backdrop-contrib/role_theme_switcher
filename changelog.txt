@@ -3,6 +3,12 @@
 // $Id $
 
 
+Role Theme Switcher  5.x-1.2, 2007 Dec 10
+------------------------
+- Moved internal interface to Drupal forms
+- Changed order of processing roles. Now "authenticated user" has the lowes priority in processing roles. If user has some more roles,
+  then theme of "authenticated user" will be overwritten by theme of other role.
+- Removed some obsolete code 
 
 Role Theme Switcher  1.2, 2007 Dec 04
 ------------------------
