@@ -1,158 +1,56 @@
 <?php
+// $Id$
+
+/** 
+ * Implemntation of hook_init().
+ */
+function role_theme_switcher_init() {
+  global $user, $custom_theme, $theme;
+  foreach ($user->roles as $key => $value) {
+    $role_name = str_replace(' ', '_', $value);
+    $role_theme = variable_get(strtolower($role_name) .'_theme', '');
+    // Change active theme in user object
+    $user->theme = $role_theme;
+    // Also change the active theme globally
+    $custom_theme = $role_theme;
+    drupal_clear_css_cache();
+  }
+}
 
 /**
- * Assign separate themes for different roles
- *
- * @author Serj Tiutiun (tiutiun AT gmail.com)
- * @date 10 Dec 2007
- * $Id $
+ * Implementation of hook_menu().
  */
-
-function role_theme_switcher_mainfunc()
-{
-   global $user, $custom_theme, $theme;
-
-    $roles = array_keys($user->roles);
-
-    // We need this order to put 'authenticated user' up. So if user has some other roles - 
-    // 'authenticated user' role will be overwritten
-    $sql =  'SELECT p.*, i.filename FROM {role_theme_switcher} p '.
-            'INNER JOIN {system} i '.
-                ' ON i.name = p.theme '.
-            "WHERE i.type = 'theme' AND i.status = 1 ORDER BY p.role_id ASC"; 
-    $db_answer = db_query($sql);
-
-    
-    // We use Role Theme Switcher only if theme is ON and it is not set as default in Role Theme Switcher
-    // If user has some roles, than if at least one role has a theme set, then we use this theme
-    $use_rts = false;
-    while ($db_row = db_fetch_object($db_answer))
-        if (in_array($db_row->role_id, $roles) && $db_row->theme != 'default')
-        {
-            $use_rts = array(
-                'theme'    => $db_row->theme,
-                'filename' => $db_row->filename);
-        }
-
-    // Switch theme
-    if ($use_rts !== false)
-    {
-        $theme = null; // We need to use this hack because of theme_init logic
-        $custom_theme = $use_rts['theme'];
-    }
-    // Finished switching theme
-}
-
-
-
-function role_theme_switcher_menu($may_cache)
-{
-    $items = array();
-
-    if ($may_cache)
-    {
-        $items[] = array(
-            'path'               => 'admin/settings/role_theme_switcher',
-            'title'              => t('Role theme switcher'),
-            'description'        => t('Here you can set different themes for different roles in your system'),
-            'callback'           => 'rts_set_theme_to_role',
-            'access'             => user_access('access administration pages'),
-            'type'               => MENU_NORMAL_ITEM
-        );
-    }
-    else 
-    {
-    	drupal_add_css(drupal_get_path('module', 'role_theme_switcher') .'/role_theme_switcher.css');
-    }
-
-    role_theme_switcher_mainfunc();
-
-    return $items;
-}
-
-
-function rts_set_theme_to_role()
-{
-    // Getting THEMES and ROLES names and ids
-    $roles = $themes = array();
-
-    //Roles
-    $sql = "SELECT * FROM {role} ORDER BY name ASC";
-    $db_answer = db_query($sql);
-
-    while ($db_row = db_fetch_object($db_answer))
-        $roles[$db_row->rid] = $db_row->name;
-
-    // Themes
-    $sql = "SELECT name FROM {system} WHERE type = 'theme' AND status = 1 ORDER BY name ASC";
-    $db_answer = db_query($sql);
-
-    while ($db_row = db_fetch_object($db_answer))
-        $themes[] =  $db_row->name;
-
-    // Themes for Roles
-    $sql = 'SELECT * FROM {role_theme_switcher}';
-    $db_answer = db_query($sql);
-
-    while ($db_row = db_fetch_object($db_answer))
-        $theme_for_role[$roles[$db_row->role_id]] = $db_row->theme;
-    // Finished getting
-
-          
-    $output = drupal_get_form('role_theme_switcher_themes_form', $roles, $themes, $theme_for_role);           
-    
-    return $output;
-}
-
-
-function role_theme_switcher_themes_form($roles, $themes, $theme_for_role)
-{
-	$themes_options = array('default' => 'default');
-	foreach ($themes AS $theme_name)
-		$themes_options[htmlspecialchars($theme_name, ENT_QUOTES)] = htmlspecialchars(ucfirst($theme_name), ENT_QUOTES);
-	
-	foreach ($roles AS $role_id => $role_name)
-	{
-		$form['role_'.$role_name] = array(
-			'#type'						=> 'select',
-  		'#title'					=> $role_name,
-  		'#value'					=> $theme_for_role[$role_name],
-  		'#default_value'	=> 'default',
-  		'#options'				=> $themes_options,
-			);		
-	}	
-
-	$form['submit'] = array(
-		'#type'						=> 'submit',
-  	'#value'					=> t('Set themes'),
-		);			
-	
-  return $form;
-}
-
-
-
-function role_theme_switcher_themes_form_submit()
-{
-	$themes = array();
-  foreach ($_POST AS $key => $val)
-  	if (strncmp('role_', $key, 5) == 0)
-    	$themes[substr($key, 5)] = $val;
-
-	$sql = 'TRUNCATE {role_theme_switcher}';
-  $db_answer = db_query($sql);
-
-  $sql = 'SELECT * FROM {role} ORDER BY name ASC';
-  $db_answer = db_query($sql);
-  
-  $roles = array();
-
-  while ($db_row = db_fetch_object($db_answer))
-  	$roles[str_replace(' ', '_', $db_row->name)] = $db_row->rid;
-
-	foreach ($themes AS $role_name => $theme_name)
-  {
-  	$sql = "INSERT INTO {role_theme_switcher} (role_id, theme) VALUES(%d, '%s')";
-    db_query($sql, $roles[$role_name], $theme_name);
+function role_theme_switcher_menu($may_cache) {
+  if ($may_cache) {
+    $items[] = array(
+      'path'               => 'admin/user/themes',
+      'type'               => MENU_NORMAL_ITEM,
+      'title'              => t('Role theme switcher'),
+      'description'        => t('Settings for role theme switcher.'),
+      'callback'           => 'drupal_get_form',
+      'callback arguments' => array('role_theme_switcher_admin_settings'),
+      'access'             => user_access('administer site configuration'),
+    );
   }
+  return $items;
+}
+
+/**
+ * Implemntation of hook_settings().
+ */
+function role_theme_switcher_admin_settings() {
+  $roles = user_roles();
+  // Get all enabled themes
+  $themes = list_themes();
+  $list = array_merge(array(t('Default')), array_keys($themes));
+  foreach ($roles as $id => $role) {
+    $role_name = str_replace(' ', '_', $role);
+    $form[strtolower($role_name) .'_theme'] = array(
+       '#type' => 'select',
+       '#title' => ucfirst(strtolower($role)),
+       '#options' => drupal_map_assoc($list),
+       '#default_value' => variable_get(strtolower($role_name) .'_theme', '')
+    );
+  }
+  return system_settings_form($form);
 }
