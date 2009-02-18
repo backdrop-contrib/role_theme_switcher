@@ -3,6 +3,20 @@
 // $Id$
 
 
+Role Theme Switcher 6.x-1.0, 2009 Feb 18
+------------------------
+Drupal 6.x release
+- Thanks to nextpulse (Robert Yau) for the proposed patch
+
+
+Role Theme Switcher  5.x-2.0, 2008 Jun 18
+------------------------
+Module was rewritten by owahab (http://owahab.com)
+- Removed a lot of unneeded code. Significantly improved logic of module
+- No more need of module tables. Removed tables. Settings are being stored now via system_settings_form submit()
+  in table "variable"
+
+
 Role Theme Switcher  5.x-1.2, 2007 Dec 10
 ------------------------
 - Moved internal interface to Drupal forms
@@ -10,9 +24,11 @@ Role Theme Switcher  5.x-1.2, 2007 Dec 10
   then theme of "authenticated user" will be overwritten by theme of other role.
 - Removed some obsolete code 
 
+
 Role Theme Switcher  1.2, 2007 Dec 04
 ------------------------
 - Fixed bug if in Drupal system used another phptemplate compatible theme.
+
 
 Role Theme Switcher  1.1, 2007 Nov 01
 ------------------------

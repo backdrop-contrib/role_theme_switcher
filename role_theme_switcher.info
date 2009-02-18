@@ -2,4 +2,8 @@
 name = Role Theme Switcher
 description = "Assign separate themes to different roles"
 package = Theme
+core = 6.x
+version = "6.4"
+project = "role_theme_switcher"
+datestamp = "1213747225"
 
