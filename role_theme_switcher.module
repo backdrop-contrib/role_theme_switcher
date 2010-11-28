@@ -2,61 +2,61 @@
 // $Id$
 
 /**
- * Implementation of hook_init().
+ * Implementation of hook_custom_theme()
  */
-function role_theme_switcher_init()
+function role_theme_switcher_custom_theme()
 {
-  global $user, $custom_theme;
+  global $user;
+  $custom_theme = NULL;
 
-  foreach ($user->roles as $key => $value)
+  foreach ($user->roles as $id => $role)
   {
-    $role_name	= str_replace(' ', '_', $value);
-    $role_theme	= variable_get(strtolower($role_name) .'_theme', '');
+    $role_theme = variable_get('role_theme_switcher_'.$id.'_theme', '');
 
-    // Change active theme in user object
-    $user->theme = $role_theme;
-
-    // Also change the active theme globally
-    $custom_theme = $role_theme;
-    drupal_clear_css_cache();
+    if ($role_theme != 'Default')
+    {
+      $custom_theme = $role_theme;
+    }
   }
+
+  return array($custom_theme);
 }
 
 /**
- * Implementation of hook_menu().
+ * Implementation of hook_menu()
  */
 function role_theme_switcher_menu()
 {
-    $items['admin/user/themes'] = array(
-      'type'            => MENU_NORMAL_ITEM,
-      'title'           => t('Role theme switcher'),
-      'description'     => t('Settings for role theme switcher.'),
-      'page callback'   => 'drupal_get_form',
-      'page arguments'  => array('role_theme_switcher_admin_settings'),
-      'access arguments'=> array('administer site configuration'),
-    );
+  $items['admin/user/themes'] = array(
+    'type'            => MENU_NORMAL_ITEM,
+    'title'           => 'Role theme switcher',
+    'description'     => 'Settings for role theme switcher.',
+    'page callback'   => 'drupal_get_form',
+    'page arguments'  => array('role_theme_switcher_admin_settings'),
+    'access arguments'=> array('administer site configuration'),
+  );
 
   return $items;
 }
 
 /**
- * Implemntation of hook_settings().
+ * Implementation of hook_settings()
  */
 function role_theme_switcher_admin_settings()
 {
   $roles = user_roles();
-  // Get all enabled themes
+
+  // Get all themes
   $themes = list_themes();
-  $list = array_merge(array(t('Default')), array_keys($themes));
+  $themes_list = array_merge(array('Default'), array_keys($themes));
 
   foreach ($roles as $id => $role)
   {
-    $role_name = str_replace(' ', '_', $role);
-    $form[strtolower($role_name) .'_theme'] = array(
-       '#type' => 'select',
-       '#title' => ucfirst(strtolower($role)),
-       '#options' => drupal_map_assoc($list),
-       '#default_value' => variable_get(strtolower($role_name) .'_theme', '')
+    $form['role_theme_switcher_'.$id.'_theme'] = array(
+       '#type'          => 'select',
+       '#title'         => ucfirst(strtolower($role)),
+       '#options'       => drupal_map_assoc($themes_list),
+       '#default_value' => variable_get('role_theme_switcher_'.$id.'_theme', '')
     );
   }
 

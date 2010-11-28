@@ -17,7 +17,7 @@ Project rewritten by owahab. http://drupal.org/user/75702
 
 REQUIREMENTS
 ------------
-Drupal 6.x
+Drupal 7.x
 
 
 INSTALLING
