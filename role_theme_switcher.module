@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Implementation of hook_custom_theme()

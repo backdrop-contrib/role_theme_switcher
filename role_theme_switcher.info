@@ -1,4 +1,3 @@
-; $Id$
 name = Role Theme Switcher
 description = "Assign separate themes to different roles"
 package = Theme

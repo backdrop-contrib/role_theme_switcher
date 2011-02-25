@@ -1,6 +1,5 @@
 // @author Serj Tiutiun (tiutiun AT gmail.com)
 // @date 1 Nov 2007
-// $Id$
 
 
 
