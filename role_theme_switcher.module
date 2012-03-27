@@ -26,7 +26,7 @@ function role_theme_switcher_custom_theme()
  */
 function role_theme_switcher_menu()
 {
-  $items['admin/people/rolethemes'] = array(
+  $items['admin/people/rolethemeswitcher'] = array(
     'type'            => MENU_LOCAL_TASK,
     'title'           => 'Role theme switcher',
     'description'     => 'Settings for role theme switcher.',
@@ -72,7 +72,6 @@ function role_theme_switcher_admin_settings()
     $form['hint'] = array(
        '#markup'        => t('Only enabled themes are shown. You can manage themes in') . ' ' . l('Appearance', 'admin/appearance') . ' ' . t('section'),
   );
-
 
   return system_settings_form($form);
 }

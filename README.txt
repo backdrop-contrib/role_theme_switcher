@@ -13,9 +13,6 @@ What to do if you want to show different theme for non-authorized user?
 Please note that this module overwrites themes set as default in admin/appearance. So if you do not want to overwrite this
 settings - you should set for your role in Role Theme Switcher a "default" theme, thus your settings won't be overwritten.
 
-Version 1.x was written for Drupal 5.0 by tiutiun. http://drupal.org/user/158669
-Project rewritten by owahab. http://drupal.org/user/75702
-
 
 REQUIREMENTS
 ------------
@@ -32,7 +29,7 @@ Read more about installing modules at http://drupal.org/node/70151
 
 CONFIGURING AND USING
 ---------------------
-Go toadmin/people/rolethemes. Follow instructions on this page.
+Go to admin/people/rolethemeswitcher. Follow instructions on this page.
 
 Please note that this module overwrites themes set as default in admin/appearance. So if you do not want to overwrite this
 settings - you should set for your role in Role Theme Switcher a "default" theme, thus your settings won't be overwritten.
