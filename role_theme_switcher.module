@@ -26,7 +26,7 @@ function role_theme_switcher_custom_theme()
  */
 function role_theme_switcher_menu()
 {
-  $items['admin/people/permissions/themes'] = array(
+  $items['admin/people/rolethemes'] = array(
     'type'            => MENU_LOCAL_TASK,
     'title'           => 'Role theme switcher',
     'description'     => 'Settings for role theme switcher.',

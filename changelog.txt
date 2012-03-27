@@ -3,6 +3,13 @@
 
 
 
+Role Theme Switcher 7.x-1.1, 2012 Mar 27
+------------------------
+Drupal 7.x release
+- Now only enabled themes are shown in Role Theme Switcher interface.
+- Fixed menu item displacement. Thanks to jorgegc and jeffschuler for the proposed patch.
+- Complies a bit more with Drupal Coding Standards. Thanks to Sutharsan.
+
 
 Role Theme Switcher 7.x-1.0, 2010 Nov 28
 ------------------------
