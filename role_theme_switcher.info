@@ -1,8 +1,8 @@
 name = Role Theme Switcher
-description = "Assign separate themes to different roles"
-package = Theme
-core = 7.x
-version = "7.1"
-project = "role_theme_switcher"
-datestamp = "1213747225"
-
+description = Assign different themes to roles on your site.
+backdrop = 1.x
+type = module
+package = Appearance
+tags[] = Theme Enhancements
+tags[] = User Interface
+configure = admin/config/people/role-theme-switcher

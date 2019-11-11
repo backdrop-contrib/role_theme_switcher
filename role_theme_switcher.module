@@ -1,77 +1,73 @@
 <?php
+/**
+ * @file
+ * Assign different themes to roles on your site.
+ */
 
 /**
- * Implementation of hook_custom_theme()
+ * Implements hook_config_info().
  */
-function role_theme_switcher_custom_theme()
-{
-  global $user;
-  $custom_theme = NULL;
-
-  foreach ($user->roles as $id => $role)
-  {
-    $role_theme = variable_get('role_theme_switcher_' . $id . '_theme', '');
-
-    if ($role_theme != 'Default')
-    {
-      $custom_theme = $role_theme;
-    }
-  }
-
-  return array($custom_theme);
-}
-
-/**
- * Implementation of hook_menu()
- */
-function role_theme_switcher_menu()
-{
-  $items['admin/people/rolethemeswitcher'] = array(
-    'type'            => MENU_LOCAL_TASK,
-    'title'           => 'Role theme switcher',
-    'description'     => 'Settings for role theme switcher.',
-    'page callback'   => 'drupal_get_form',
-    'page arguments'  => array('role_theme_switcher_admin_settings'),
-    'access arguments'=> array('administer site configuration'),
+function role_theme_switcher_config_info() {
+  return array(
+    'role_theme_switcher.settings' => array(
+      'label' => t('Role Theme Switcher settings'),
+      'group' => t('Configuration'),
+    ),
   );
-
-  return $items;
 }
 
 /**
- * Implementation of hook_settings()
+ * Implements hook_custom_theme().
  */
-function role_theme_switcher_admin_settings()
-{
-  $roles = user_roles();
+function role_theme_switcher_custom_theme() {
+  global $user;
 
-  // Get all themes
-  $themes = list_themes();
+  foreach ($user->roles as $role) {
+    if ($role_theme = config_get('role_theme_switcher.settings', $role)) {
+      return $role_theme;
+    }
+  }
+}
 
-  $themes_list = array('Default');
+/**
+ * Implements hook_menu().
+ */
+function role_theme_switcher_menu() {
+  return array(
+    'admin/config/people/role-theme-switcher' => array(
+      'title' => 'Role theme switcher',
+      'description' => 'Assign different themes to roles on your site.',
+      'page callback' => 'backdrop_get_form',
+      'page arguments' => array('role_theme_switcher_settings'),
+      'access arguments' => array('administer site configuration'),
+      'type' => MENU_NORMAL_ITEM,
+    ),
+  );
+}
 
-  foreach ($themes AS $theme_name => $theme)
-  {
-    if (drupal_theme_access($theme))
-    {
-    	$themes_list[] = $theme_name;
+/**
+ * Form builder function for module settings.
+ */
+function role_theme_switcher_settings() {
+  $form['#config'] = 'role_theme_switcher.settings';
+  $config = config('role_theme_switcher.settings');
+
+  // Get available themes.
+  $options = array('' => t('Default theme'));
+  foreach (list_themes() as $theme) {
+    if (backdrop_theme_access($theme)) {
+    	$options[$theme->name] = $theme->info['name'];
     }
   }
 
-
-  foreach ($roles as $id => $role)
-  {
-    $form['role_theme_switcher_' . $id . '_theme'] = array(
-       '#type'          => 'select',
-       '#title'         => drupal_ucfirst(drupal_strtolower($role)),
-       '#options'       => drupal_map_assoc($themes_list),
-       '#default_value' => variable_get('role_theme_switcher_' . $id . '_theme', '')
+  foreach (user_roles() as $id => $name) {
+    $form[$id] = array(
+      '#type' => 'select',
+      '#title' => $name,
+      '#options' => $options,
+      '#default_value' => $config->get($id),
     );
   }
-
-    $form['hint'] = array(
-       '#markup'        => t('Only enabled themes are shown. You can manage themes in') . ' ' . l('Appearance', 'admin/appearance') . ' ' . t('section'),
-  );
 
   return system_settings_form($form);
 }

@@ -1,6 +1,43 @@
 <?php
+/**
+ * @file
+ * Install, update, and uninstall functions for the Role Theme Switcher module.
+ */
 
-function role_theme_switcher_update_7011()
-{
-  menu_rebuild();
+/**
+ * Convert variables to config.
+ */
+function role_theme_switcher_update_1000() {
+  $config = config('role_theme_switcher.settings');
+
+  foreach (user_roles() as $id => $name) {
+    // Get old Drupal role ID.
+    if ($id == 'anonymous') {
+      $rid = '1';
+    }
+    elseif ($id == 'authenticated') {
+      $rid = '2';
+    }
+    else {
+      $rid = $id;
+    }
+
+    if ($variable = update_variable_get('role_theme_switcher_' . $rid . '_theme')) {
+      if ($variable == 'Default') {
+        $variable = '';
+      }
+
+      $config->set($id, $variable);
+      update_variable_del('role_theme_switcher_' . $rid . '_theme');
+    }
+  }
+
+  $config->save();
+}
+
+/**
+ * Implements hook_update_last_removed().
+ */
+function role_theme_switcher_update_last_removed() {
+  return 7011;
 }
