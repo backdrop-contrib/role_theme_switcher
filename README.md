@@ -25,7 +25,7 @@ https://github.com/backdrop-contrib/role_theme_switcher/issues.
 Current Maintainers
 -------------------
 
-- Peter Anderson (https://github.com/BWPanda).
+- Seeking maintainer(s)
 
 Credits
 -------
